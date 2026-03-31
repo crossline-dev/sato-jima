@@ -12,18 +12,67 @@ import { contactFormSchema } from '@/schemas/contact-form-schema'
 
 const resend = new Resend(env.RESEND_API_KEY)
 
+/** 問い合わせ処理の失敗分類（機密を含まない。ログ・クライアント双方の観測用） */
+export type ContactFailureKind =
+  | 'validation'
+  | 'rate_limit'
+  | 'send_failed'
+  | 'unexpected'
+
+/**
+ * contactFormAction の戻り値。
+ * - success === true … 送信完了。failureKind は undefined。
+ * - success === false … failureKind で理由を区別。ユーザー向け文言は result 内のみ。
+ */
 export type ContactFormState = {
   result: SubmissionResult | null
   success: boolean
+  failureKind?: ContactFailureKind
 }
 
-function errorResponse(message: string): ContactFormState {
+const USER_MSG_RATE_LIMIT =
+  '送信回数の上限に達しました。しばらく時間をおいてから再度お試しください。'
+const USER_MSG_SEND_FAILED =
+  'メールの送信に失敗しました。時間をおいて再度お試しください。'
+const USER_MSG_UNEXPECTED =
+  '送信中にエラーが発生しました。時間をおいて再度お試しください。'
+
+function logContactEvent(
+  kind: ContactFailureKind,
+  message: string,
+  context?: Record<string, unknown>,
+): void {
+  const payload = { kind, message, ...context }
+  console.error('[ContactForm]', JSON.stringify(payload))
+}
+
+function logUnknownError(
+  kind: ContactFailureKind,
+  phase: string,
+  error: unknown,
+): void {
+  if (error instanceof Error) {
+    logContactEvent(kind, phase, {
+      errorName: error.name,
+      errorMessage: error.message,
+      stack: error.stack,
+    })
+  } else {
+    logContactEvent(kind, phase, { error: String(error) })
+  }
+}
+
+function errorResponse(
+  message: string,
+  failureKind: ContactFailureKind,
+): ContactFormState {
   return {
     result: {
       status: 'error',
       error: { '': [message] },
     },
     success: false,
+    failureKind,
   }
 }
 
@@ -31,19 +80,33 @@ export async function contactFormAction(
   _prevState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
-  // 1. レートリミットチェック（IP）
   const headersList = await headers()
   const ip =
     headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '127.0.0.1'
 
-  const rateLimitResult = await checkRateLimit(ip)
-  if (!rateLimitResult.success) {
-    return errorResponse(
-      '送信回数の上限に達しました。しばらく時間をおいてから再度お試しください。',
-    )
+  let rateLimitResult: Awaited<ReturnType<typeof checkRateLimit>>
+  try {
+    rateLimitResult = await checkRateLimit(ip)
+  } catch (error: unknown) {
+    logUnknownError('unexpected', 'rate_limit_check_threw', error)
+    return {
+      result: {
+        status: 'error',
+        error: { '': [USER_MSG_UNEXPECTED] },
+      },
+      success: false,
+      failureKind: 'unexpected',
+    }
   }
 
-  // 2. Valibot バリデーション
+  if (!rateLimitResult.success) {
+    logContactEvent('rate_limit', 'limit_exceeded', {
+      remaining: rateLimitResult.remaining,
+      reset: rateLimitResult.reset,
+    })
+    return errorResponse(USER_MSG_RATE_LIMIT, 'rate_limit')
+  }
+
   const submission = parseWithValibot(formData, {
     schema: contactFormSchema,
   })
@@ -52,12 +115,12 @@ export async function contactFormAction(
     return {
       result: submission.reply(),
       success: false,
+      failureKind: 'validation',
     }
   }
 
   const { name, furigana, email, phone, message } = submission.value
 
-  // 3. メール送信（Promise.all）
   try {
     const [adminResult, userResult] = await Promise.all([
       resend.emails.send({
@@ -82,13 +145,26 @@ export async function contactFormAction(
     ])
 
     if (adminResult.error || userResult.error) {
+      logContactEvent('send_failed', 'resend_api_error', {
+        adminError: adminResult.error
+          ? {
+              name: adminResult.error.name,
+              message: adminResult.error.message,
+            }
+          : null,
+        userError: userResult.error
+          ? {
+              name: userResult.error.name,
+              message: userResult.error.message,
+            }
+          : null,
+      })
       return {
         result: submission.reply({
-          formErrors: [
-            'メールの送信に失敗しました。時間をおいて再度お試しください。',
-          ],
+          formErrors: [USER_MSG_SEND_FAILED],
         }),
         success: false,
+        failureKind: 'send_failed',
       }
     }
 
@@ -96,14 +172,14 @@ export async function contactFormAction(
       result: submission.reply({ resetForm: true }),
       success: true,
     }
-  } catch {
+  } catch (error: unknown) {
+    logUnknownError('unexpected', 'email_send_threw', error)
     return {
       result: submission.reply({
-        formErrors: [
-          '送信中にエラーが発生しました。時間をおいて再度お試しください。',
-        ],
+        formErrors: [USER_MSG_UNEXPECTED],
       }),
       success: false,
+      failureKind: 'unexpected',
     }
   }
 }
