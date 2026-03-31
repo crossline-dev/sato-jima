@@ -2,7 +2,12 @@ import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import { createStorefrontClient } from '@shopify/hydrogen-react'
 import { print } from 'graphql'
 import { env } from '@/env/client'
-import { isShopifyError } from '@/utils/type-guards'
+import {
+  isShopifyApiError,
+  processShopifyStorefrontResponse,
+  rejectAsShopifyNetworkError,
+  rejectAsShopifyParseError,
+} from './shopify-api-error'
 
 /**
  * Shopify Storefront Client (Client-side)
@@ -57,6 +62,8 @@ export async function shopifyClientFetch<TResult, TVariables>(
     tags = [],
   } = options
 
+  const queryStr = print(query)
+
   try {
     const result = await fetch(getStorefrontApiUrl(), {
       method: 'POST',
@@ -65,36 +72,25 @@ export async function shopifyClientFetch<TResult, TVariables>(
         ...headers,
       },
       body: JSON.stringify({
-        query: print(query),
+        query: queryStr,
         ...(variables && { variables }),
       }),
       cache,
       next: { tags },
     })
 
-    const body = await result.json()
-
-    if (body.errors) {
-      throw body.errors[0]
+    let body: unknown
+    try {
+      body = await result.json()
+    } catch (error) {
+      rejectAsShopifyParseError(queryStr, result.status, error)
     }
 
-    return {
-      status: result.status,
-      body,
+    return processShopifyStorefrontResponse<TResult>(result, body, queryStr)
+  } catch (error) {
+    if (isShopifyApiError(error)) {
+      throw error
     }
-  } catch (error: unknown) {
-    if (isShopifyError(error)) {
-      throw {
-        cause: error.cause?.toString() || 'unknown',
-        status: error.status || 500,
-        message: error.message,
-        query: print(query),
-      }
-    }
-
-    throw {
-      error,
-      query: print(query),
-    }
+    rejectAsShopifyNetworkError(queryStr, error)
   }
 }

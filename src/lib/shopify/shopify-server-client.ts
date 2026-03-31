@@ -6,7 +6,12 @@ import { print } from 'graphql'
 import { headers } from 'next/headers'
 import { env as clientEnv } from '@/env/client'
 import { env as serverEnv } from '@/env/server'
-import { isShopifyError } from '@/utils/type-guards'
+import {
+  isShopifyApiError,
+  processShopifyStorefrontResponse,
+  rejectAsShopifyNetworkError,
+  rejectAsShopifyParseError,
+} from './shopify-api-error'
 
 /**
  * Shopify Storefront Client (Server-side)
@@ -64,6 +69,7 @@ async function shopifyFetchInternal<TResult, TVariables>(
   options: InternalFetchOptions<TResult, TVariables>,
 ): Promise<ShopifyFetchResult<TResult>> {
   const { query, variables, headersInit, cache, tags, buyerIp } = options
+  const queryStr = print(query)
 
   try {
     const result = await fetch(getStorefrontApiUrl(), {
@@ -73,42 +79,27 @@ async function shopifyFetchInternal<TResult, TVariables>(
         ...headersInit,
       },
       body: JSON.stringify({
-        query: print(query),
+        query: queryStr,
         ...(variables && { variables }),
       }),
       cache,
       next: { tags },
     })
 
-    const body = await result.json()
-
-    if (body.errors) {
-      const error = body.errors[0]
-      console.error(
-        '[Shopify GraphQL Error]',
-        JSON.stringify(body.errors, null, 2),
-      )
-      throw new Error(error.message || 'Unknown GraphQL error')
+    let body: unknown
+    try {
+      body = await result.json()
+    } catch (error) {
+      rejectAsShopifyParseError(queryStr, result.status, error)
     }
 
-    return {
-      status: result.status,
-      body,
-    }
-  } catch (error: unknown) {
-    console.error('[Shopify Fetch Error]', error)
-
-    if (isShopifyError(error)) {
-      throw new Error(
-        `Shopify API Error: ${error.message} (status: ${error.status || 500})`,
-      )
-    }
-
-    if (error instanceof Error) {
+    return processShopifyStorefrontResponse<TResult>(result, body, queryStr)
+  } catch (error) {
+    if (isShopifyApiError(error)) {
       throw error
     }
-
-    throw new Error(`Unknown Shopify error: ${JSON.stringify(error)}`)
+    console.error('[Shopify Fetch Error]', error)
+    rejectAsShopifyNetworkError(queryStr, error)
   }
 }
 

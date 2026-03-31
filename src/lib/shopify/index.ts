@@ -19,6 +19,12 @@ export {
   getProductRecommendations,
   getProducts,
 } from './products-api'
+// Shopify API エラー（サーバー／クライアント共通）
+export type {
+  ShopifyApiErrorKind,
+  ShopifyGraphQLErrorEntry,
+} from './shopify-api-error'
+export { isShopifyApiError, ShopifyApiError } from './shopify-api-error'
 // Shopify Server Client (サーバーサイド用 - プライベートトークン使用)
 // クライアントサイド用は直接 '@/lib/shopify/shopify-client' からインポートしてください
 export type {
