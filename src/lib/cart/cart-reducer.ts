@@ -69,6 +69,14 @@ function updateCartTotals(
 }
 
 /**
+ * 楽観更新の打ち消し用に、現在のカートをディープコピーする
+ * （undefined の場合はそのまま戻すことで、厳密な直前状態を維持する）
+ */
+export function cloneCartSnapshot(cart: Cart | undefined): Cart | undefined {
+  return cart ? structuredClone(cart) : undefined
+}
+
+/**
  * 空のカートを作成
  */
 export function createEmptyCart(): Cart {
@@ -88,7 +96,14 @@ export function createEmptyCart(): Cart {
 /**
  * カートリデューサー
  */
-export function cartReducer(state: Cart | undefined, action: CartAction): Cart {
+export function cartReducer(
+  state: Cart | undefined,
+  action: CartAction,
+): Cart | undefined {
+  if (action.type === 'RESET_TO_CART') {
+    return action.payload.cart ? structuredClone(action.payload.cart) : undefined
+  }
+
   const currentCart = state || createEmptyCart()
   const currencyCode = currentCart.cost.totalAmount.currencyCode as CurrencyCode
 

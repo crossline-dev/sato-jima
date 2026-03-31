@@ -43,7 +43,9 @@ export function CartProvider({
 
 /**
  * カートフック
- * カート状態と操作メソッドを提供
+ * - `cartReducer`: 純粋なカート変換（ADD / UPDATE / RESET）
+ * - ここでは `useOptimistic` に reducer を渡し、楽観更新の dispatch を公開する
+ * - Server Action 失敗後の復旧は呼び出し側が `cloneCartSnapshot` → `restoreCartToSnapshot` で行う
  */
 export function useCart(): UseCartReturn {
   const context = useContext(CartContext)
@@ -75,6 +77,17 @@ export function useCart(): UseCartReturn {
     [updateOptimisticCart],
   )
 
+  /** Server Action 失敗時: addCartItem 前に cloneCartSnapshot で保存した状態へ戻す */
+  const restoreCartToSnapshot = useCallback(
+    (snapshot: Cart | undefined) => {
+      updateOptimisticCart({
+        type: 'RESET_TO_CART',
+        payload: { cart: snapshot },
+      })
+    },
+    [updateOptimisticCart],
+  )
+
   return useMemo(
     () => ({
       cart: optimisticCart,
@@ -85,7 +98,16 @@ export function useCart(): UseCartReturn {
       closeCart,
       updateCartItem,
       addCartItem,
+      restoreCartToSnapshot,
     }),
-    [optimisticCart, isOpen, openCart, closeCart, updateCartItem, addCartItem],
+    [
+      optimisticCart,
+      isOpen,
+      openCart,
+      closeCart,
+      updateCartItem,
+      addCartItem,
+      restoreCartToSnapshot,
+    ],
   )
 }

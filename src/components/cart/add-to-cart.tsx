@@ -2,7 +2,7 @@
 
 import { HandbagIcon } from '@phosphor-icons/react'
 import { Plus } from 'lucide-react'
-import { useTransition } from 'react'
+import { useRef, useTransition } from 'react'
 import { toast } from 'sonner'
 import { addItem } from '@/actions/cart-actions'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useCartSchedule } from '@/hooks/use-cart-schedule'
 import { useShopifyAnalytics } from '@/hooks/use-shopify-analytics'
 import { useCart } from '@/lib/cart'
+import { cloneCartSnapshot } from '@/lib/cart/cart-reducer'
 import type { CartItem } from '@/lib/shopify'
 import type { CurrencyCode } from '@/lib/shopify/generated/graphql'
 
@@ -48,7 +49,9 @@ export function AddToCart({
   saleStartDate,
   itemInfo,
 }: AddToCartProps) {
-  const { addCartItem, openCart } = useCart()
+  const { cart, addCartItem, restoreCartToSnapshot, openCart } = useCart()
+  const cartRef = useRef(cart)
+  cartRef.current = cart
   const { sendAddToCart } = useShopifyAnalytics()
   const { isCartOpen, cartOpenLabel } = useCartSchedule(saleStartDate)
   const [isPending, startTransition] = useTransition()
@@ -78,15 +81,14 @@ export function AddToCart({
       },
     }
 
-    // 楽観的更新とサーバーアクションを transition 内で実行
-    // 完了後にシートを開く
+    // 楽観的更新 → Server Action。失敗時は addCartItem 前のスナップショットへ restoreCartToSnapshot で戻す
     startTransition(async () => {
+      const cartBeforeOptimisticAdd = cloneCartSnapshot(cartRef.current)
       addCartItem(optimisticItem)
       const result = await addItem(variantId)
 
       if (!result.success) {
-        // エラーが発生した場合は、楽観的更新の状態（addCartItem）について再検証が必要だが、
-        // 開発の現状では revalidateTag が走るため、整合性は保たれる。
+        restoreCartToSnapshot(cartBeforeOptimisticAdd)
         toast.error(result.error || 'カートへの追加に失敗しました。')
         return
       }
