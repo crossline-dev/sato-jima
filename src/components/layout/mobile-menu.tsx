@@ -5,6 +5,12 @@ import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import {
+  FEATURED_COLLECTION_MENU_ITEMS,
+  PRODUCTS_MENU_COLLECTION_ITEMS,
+  SHOPIFY_CUSTOMER_ACCOUNT_URL,
+  storefrontCollectionPath,
+} from '@/config/storefront'
 import { FOOTER_NAV } from '@/components/layout/footer-nav'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -16,8 +22,6 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 
-const SHOPIFY_ACCOUNT_URL = 'https://shopify.com/70593708186/account'
-
 export interface MobileNavItem {
   label: string
   href: string
@@ -28,12 +32,11 @@ export const MOBILE_NAV_ITEMS: MobileNavItem[] = [
   { label: 'About', href: '/about' },
   {
     label: 'Products',
-    href: '/collections/all',
-    children: [
-      { label: 'All', href: '/collections/all' },
-      { label: 'New Items', href: '/collections/new-items' },
-      { label: 'Limited Goods', href: '/collections/limited-goods' },
-    ],
+    href: storefrontCollectionPath(PRODUCTS_MENU_COLLECTION_ITEMS[0].handle),
+    children: PRODUCTS_MENU_COLLECTION_ITEMS.map(({ label, handle }) => ({
+      label,
+      href: storefrontCollectionPath(handle),
+    })),
   },
 ]
 
@@ -133,24 +136,15 @@ export function MobileMenu() {
                   Collections
                 </Link>
                 <div className='flex flex-col gap-1'>
-                  <Link
-                    href='/collections/original-bear'
-                    onClick={() => setIsOpen(false)}
-                    className='block rounded-md py-2 pr-5 pl-9 font-en text-muted-foreground text-sm transition-colors hover:bg-secondary hover:text-foreground'>
-                    Original Bear
-                  </Link>
-                  <Link
-                    href='/collections/event-goods'
-                    onClick={() => setIsOpen(false)}
-                    className='block rounded-md py-2 pr-5 pl-9 font-en text-muted-foreground text-sm transition-colors hover:bg-secondary hover:text-foreground'>
-                    Event Goods
-                  </Link>
-                  <Link
-                    href='/collections/apparel'
-                    onClick={() => setIsOpen(false)}
-                    className='block rounded-md py-2 pr-5 pl-9 font-en text-muted-foreground text-sm transition-colors hover:bg-secondary hover:text-foreground'>
-                    Apparel
-                  </Link>
+                  {FEATURED_COLLECTION_MENU_ITEMS.map(({ label, handle }) => (
+                    <Link
+                      key={handle}
+                      href={storefrontCollectionPath(handle)}
+                      onClick={() => setIsOpen(false)}
+                      className='block rounded-md py-2 pr-5 pl-9 font-en text-muted-foreground text-sm transition-colors hover:bg-secondary hover:text-foreground'>
+                      {label}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
@@ -160,7 +154,7 @@ export function MobileMenu() {
           <SheetFooter className='border-t bg-background p-0 py-4'>
             <div className='w-full'>
               <a
-                href={SHOPIFY_ACCOUNT_URL}
+                href={SHOPIFY_CUSTOMER_ACCOUNT_URL}
                 onClick={() => setIsOpen(false)}
                 className='flex items-center gap-2 px-5 py-2 text-sm transition-colors hover:opacity-70'
                 aria-label='アカウント'>

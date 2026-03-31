@@ -4,6 +4,7 @@ import {
   CollectionQuery,
   CollectionsQuery,
 } from './queries/collection'
+import { FEATURED_COLLECTION_HANDLES } from '@/config/storefront'
 import { shopifyFetch, shopifyFetchStatic } from './shopify-server-client'
 
 /**
@@ -85,13 +86,8 @@ export async function getAllCollectionHandles() {
  * メインコレクション（Featured）を取得
  *
  * 指定されたハンドルのコレクションを順序を維持して返します。
+ * ハンドル順は `@/config/storefront` の FEATURED_COLLECTION_HANDLES に合わせる。
  */
-export const FEATURED_COLLECTION_HANDLES = [
-  'original-bear',
-  'event-goods',
-  'apparel',
-] as const
-
 export async function getFeaturedCollections() {
   const allCollections = await getCollections()
 

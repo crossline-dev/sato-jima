@@ -4,12 +4,11 @@ import { UserIcon } from '@phosphor-icons/react'
 import { usePathname } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import { CartButton } from '@/components/cart/cart-button'
+import { SHOPIFY_CUSTOMER_ACCOUNT_URL } from '@/config/storefront'
 import { cn } from '@/utils/classes'
 import { MobileMenu } from './mobile-menu'
 import { NavLinks } from './nav-links'
 import { SiteLogo } from './site-logo'
-
-const SHOPIFY_ACCOUNT_URL = 'https://shopify.com/70593708186/account'
 
 function CartButtonFallback() {
   return (
@@ -73,7 +72,7 @@ export function Header() {
           {/* 右側: アカウント + カート */}
           <div className='flex flex-1 items-center justify-end gap-2'>
             <a
-              href={SHOPIFY_ACCOUNT_URL}
+              href={SHOPIFY_CUSTOMER_ACCOUNT_URL}
               className='hidden h-10 items-center gap-1 px-2 font-medium text-sm hover:opacity-70 md:flex'
               aria-label='アカウント'>
               <UserIcon weight='light' className='size-6' />

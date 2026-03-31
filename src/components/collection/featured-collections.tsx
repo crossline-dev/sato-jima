@@ -2,6 +2,10 @@
 
 import * as m from 'motion/react-m'
 import Link from 'next/link'
+import {
+  FEATURED_COLLECTION_MENU_ITEMS,
+  storefrontCollectionPath,
+} from '@/config/storefront'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 interface Collection {
@@ -10,24 +14,13 @@ interface Collection {
   title: string
 }
 
-// ハードコードされたコレクションデータ
-const HARDCODED_COLLECTIONS: Collection[] = [
-  {
-    id: 'gid://shopify/Collection/original-bear',
-    handle: 'original-bear',
-    title: 'Original Bear',
-  },
-  {
-    id: 'gid://shopify/Collection/event-goods',
-    handle: 'event-goods',
-    title: 'Event Goods',
-  },
-  {
-    id: 'gid://shopify/Collection/apparel',
-    handle: 'apparel',
-    title: 'Apparel',
-  },
-]
+const HARDCODED_COLLECTIONS: Collection[] = FEATURED_COLLECTION_MENU_ITEMS.map(
+  item => ({
+    id: `gid://shopify/Collection/${item.handle}`,
+    handle: item.handle,
+    title: item.label,
+  }),
+)
 
 interface FeaturedCollectionsProps {
   collections?: Collection[]
@@ -125,7 +118,7 @@ function TriangleCollectionCard({
       {...animationProps}
       className='flex flex-col items-center px-8 sm:px-0'>
       <Link
-        href={`/collections/${handle}`}
+        href={storefrontCollectionPath(handle)}
         onClick={onClick}
         className='group relative flex w-full cursor-pointer flex-col items-center transition-transform hover:scale-105'
         style={{

@@ -1,5 +1,9 @@
 import Link from 'next/link'
 import { useState } from 'react'
+import {
+  PRODUCTS_MENU_COLLECTION_ITEMS,
+  storefrontCollectionPath,
+} from '@/config/storefront'
 import { FeaturedCollections } from '@/components/collection/featured-collections'
 import {
   NavigationMenu,
@@ -20,7 +24,10 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: 'About', href: '/about' },
   { label: 'Collections', href: '/collections' },
-  { label: 'Products', href: '/collections/all' },
+  {
+    label: 'Products',
+    href: storefrontCollectionPath(PRODUCTS_MENU_COLLECTION_ITEMS[0].handle),
+  },
 ] as const
 
 interface NavLinksProps {
