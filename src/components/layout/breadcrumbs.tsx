@@ -50,8 +50,8 @@ export function Breadcrumbs({ items, className, baseUrl }: BreadcrumbsProps) {
               <div key={item.label} className='flex items-center gap-1'>
                 <BreadcrumbItem>
                   {item.href && !isLast ? (
-                    <BreadcrumbLink asChild>
-                      <Link href={item.href}>{item.label}</Link>
+                    <BreadcrumbLink render={<Link href={item.href} />}>
+                      {item.label}
                     </BreadcrumbLink>
                   ) : (
                     <BreadcrumbPage className='max-w-50 truncate md:max-w-100'>

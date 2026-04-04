@@ -1,3 +1,14 @@
+/**
+ * @agent-guard
+ * - CART_OPEN_DATE は Coming Soon / カート有効判定の根幹。変更時は以下に影響:
+ *   → isCartEnabled() → cart-actions.ts (addItem) → AddToCartButton → ComingSoonBadge
+ * - siteConfig はブランド情報の SSOT。変更は全ページメタデータ・OGP に波及する
+ * - siteUrl は環境変数から自動解決。手動でハードコードしないこと
+ *
+ * @see docs/business/domain-spec.md
+ * @see docs/business/migration-checklist.md
+ */
+
 function resolveBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
@@ -9,7 +20,7 @@ function resolveBaseUrl(): string {
  * この日時を過ぎるとカート機能（追加・チェックアウト）が有効になる
  * 公開後不要になったら `null` に変更するか、この設定を削除する
  */
-export const CART_OPEN_DATE = new Date('2026-02-14T20:00:00+09:00')
+export const CART_OPEN_DATE = new Date('2026-06-30T00:00:00+09:00')
 
 /**
  * カートが現在有効かどうかを判定
@@ -20,7 +31,7 @@ export function isCartEnabled(): boolean {
 }
 
 /**
- * カートオープン日時の表示用ラベル（例: "2/14(金) 20:00"）
+ * カートオープン日時の表示用ラベル（例: "6/30(月) 00:00"）
  * モジュールレベルで1回だけ計算
  */
 export const CART_OPEN_LABEL = CART_OPEN_DATE.toLocaleDateString('ja-JP', {
@@ -33,24 +44,20 @@ export const CART_OPEN_LABEL = CART_OPEN_DATE.toLocaleDateString('ja-JP', {
 })
 
 export const siteConfig = {
-  siteName: 'TRIANGLE SHOP',
-  siteNameEn: 'TRIANGLE SHOP',
+  siteName: 'さと島 SHOP',
+  siteNameEn: 'SATO-JIMA SHOP',
   siteDescription:
-    '佐藤三兄弟オフィシャルショップ「TRIANGLE SHOP」。オリジナルベアやイベントグッズ、アパレルなど、佐藤三兄弟の公式グッズをお届けします。',
-  siteTitle: 'TRIANGLE SHOP | 佐藤三兄弟オフィシャルショップ',
-  siteMetaTitle: 'TRIANGLE SHOP',
+    'さと島 SHOP はアーティスト公式グッズのオンラインショップです。こだわりのアイテムをお届けします。',
+  siteTitle: 'さと島 SHOP | 公式オンラインショップ',
+  siteMetaTitle: 'さと島 SHOP',
   siteKeywords: [
-    'TRIANGLE SHOP',
-    '佐藤三兄弟',
-    'オフィシャルショップ',
+    'さと島 SHOP',
     '公式グッズ',
-    'オリジナルベア',
-    'イベントグッズ',
-    'アパレル',
+    'オンラインショップ',
+    'アーティストグッズ',
   ],
   siteUrl: resolveBaseUrl(),
-  blogURL: 'https://ameblo.jp/sitanosan/',
-  siteSubTitle: '佐藤三兄弟オフィシャルショップ',
+  siteSubTitle: '公式オンラインショップ',
 }
 
 export const metadataBase = new URL(resolveBaseUrl())

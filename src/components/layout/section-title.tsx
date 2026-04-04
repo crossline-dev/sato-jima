@@ -39,7 +39,7 @@ export function SectionTitle({
 }: SectionTitleProps) {
   return (
     <hgroup className={`flex flex-col items-center gap-2 ${className ?? ''}`}>
-      <Tag className='font-accent text-3xl text-heading tracking-wide'>
+      <Tag className='font-en text-3xl text-heading tracking-wide'>
         {title}
       </Tag>
       {subtitle && (

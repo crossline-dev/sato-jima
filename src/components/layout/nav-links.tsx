@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   PRODUCTS_MENU_COLLECTION_ITEMS,
   storefrontCollectionPath,
-} from '@/config/storefront'
+} from '@/config/navigation'
 import { FeaturedCollections } from '@/components/collection/featured-collections'
 import {
   NavigationMenu,
@@ -93,17 +93,19 @@ export function NavLinks({
                 </NavigationMenuContent>
               </>
             ) : (
-              <NavigationMenuLink asChild>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    'bg-transparent font-medium text-sm hover:opacity-70',
-                    linkClassName,
-                  )}
-                  onClick={handleItemClick}>
-                  {item.label}
-                </Link>
+              <NavigationMenuLink
+                render={
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      'bg-transparent font-medium text-sm hover:opacity-70',
+                      linkClassName,
+                    )}
+                    onClick={handleItemClick}
+                  />
+                }>
+                {item.label}
               </NavigationMenuLink>
             )}
           </NavigationMenuItem>

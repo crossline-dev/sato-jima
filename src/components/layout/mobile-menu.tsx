@@ -3,15 +3,14 @@
 import { UserIcon } from '@phosphor-icons/react'
 import type { Route } from 'next'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
 import {
   FEATURED_COLLECTION_MENU_ITEMS,
-  PRODUCTS_MENU_COLLECTION_ITEMS,
   SHOPIFY_CUSTOMER_ACCOUNT_URL,
   storefrontCollectionPath,
-} from '@/config/storefront'
+} from '@/config/navigation'
 import { FOOTER_NAV } from '@/components/layout/footer-nav'
+import { MOBILE_NAV_ITEMS } from '@/components/layout/navigation-data'
+import { useMobileMenuState } from '@/hooks/use-mobile-menu-state'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Sheet,
@@ -22,48 +21,10 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 
-export interface MobileNavItem {
-  label: string
-  href: string
-  children?: { label: string; href: string }[]
-}
-
-export const MOBILE_NAV_ITEMS: MobileNavItem[] = [
-  { label: 'About', href: '/about' },
-  {
-    label: 'Products',
-    href: storefrontCollectionPath(PRODUCTS_MENU_COLLECTION_ITEMS[0].handle),
-    children: PRODUCTS_MENU_COLLECTION_ITEMS.map(({ label, handle }) => ({
-      label,
-      href: storefrontCollectionPath(handle),
-    })),
-  },
-]
+export { MOBILE_NAV_ITEMS, type MobileNavItem } from '@/components/layout/navigation-data'
 
 export function MobileMenu() {
-  const [isOpen, setIsOpen] = useState(false)
-  const pathname = usePathname()
-
-  const prevPathnameRef = useRef(pathname)
-
-  // パス変更時にメニューを閉じる（レンダー中に比較、useEffectでの同期的setStateを回避）
-  if (prevPathnameRef.current !== pathname) {
-    prevPathnameRef.current = pathname
-    if (isOpen) {
-      setIsOpen(false)
-    }
-  }
-
-  // リサイズ時にメニューを閉じる
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsOpen(false)
-      }
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const { isOpen, setIsOpen } = useMobileMenuState()
 
   return (
     <>
@@ -127,7 +88,6 @@ export function MobileMenu() {
                 ))}
               </nav>
 
-              {/* Collections セクション */}
               <div>
                 <Link
                   href='/collections'
@@ -150,7 +110,6 @@ export function MobileMenu() {
             </div>
           </ScrollArea>
 
-          {/* Account リンク + Policies リンクセクション */}
           <SheetFooter className='border-t bg-background p-0 py-4'>
             <div className='w-full'>
               <a
