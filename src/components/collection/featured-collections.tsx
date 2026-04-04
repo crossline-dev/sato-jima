@@ -14,13 +14,16 @@ interface Collection {
   title: string
 }
 
-const HARDCODED_COLLECTIONS: Collection[] = FEATURED_COLLECTION_MENU_ITEMS.map(
-  item => ({
-    id: `gid://shopify/Collection/${item.handle}`,
-    handle: item.handle,
-    title: item.label,
-  }),
-)
+const HARDCODED_COLLECTIONS: Collection[] = (
+  FEATURED_COLLECTION_MENU_ITEMS as unknown as {
+    handle: string
+    label: string
+  }[]
+).map(item => ({
+  id: `gid://shopify/Collection/${item.handle}`,
+  handle: item.handle,
+  title: item.label,
+}))
 
 interface FeaturedCollectionsProps {
   collections?: Collection[]
@@ -41,7 +44,7 @@ export function FeaturedCollections({
   return (
     <div className='grid grid-cols-1 gap-8 sm:grid-cols-3 md:gap-12'>
       {collections.map((collection, index) => (
-        <TriangleCollectionCard
+        <CollectionCard
           key={collection.id}
           collection={collection}
           index={index}
@@ -53,19 +56,19 @@ export function FeaturedCollections({
   )
 }
 
-interface TriangleCollectionCardProps {
+interface CollectionCardProps {
   collection: Collection
   index: number
   onClick?: () => void
   animateOnMount?: boolean
 }
 
-function TriangleCollectionCard({
+function CollectionCard({
   collection,
   index,
   onClick,
   animateOnMount = false,
-}: TriangleCollectionCardProps) {
+}: CollectionCardProps) {
   const { handle, title } = collection
   const prefersReducedMotion = useReducedMotion()
 
@@ -165,7 +168,7 @@ function TriangleCollectionCard({
             y={centroidY}
             textAnchor='middle'
             dominantBaseline='middle'
-            className='fill-foreground font-accent font-medium text-xl leading-loose tracking-wide'>
+            className='fill-foreground font-en font-medium text-xl leading-loose tracking-wide'>
             {displayTitle.split('\n').map((line, i, arr) => (
               <tspan
                 key={line}

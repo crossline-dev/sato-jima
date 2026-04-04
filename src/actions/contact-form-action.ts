@@ -1,3 +1,17 @@
+/**
+ * @agent-guard
+ * フォーム4層構成の参考実装（Server Action 層）
+ *
+ * - 新しいフォームを作る場合、このファイルの構造を模範にする:
+ *   1. parseWithValibot(formData, { schema }) でバリデーション
+ *   2. submission.status !== 'success' → submission.reply() で返却
+ *   3. 処理失敗 → errorResponse() で failureKind 付き返却
+ *   4. 処理成功 → submission.reply({ resetForm: true }) で返却
+ * - フォームコンポーネント側は useActionState + @conform-to/react を使う
+ *
+ * @see docs/agent-rules/01-principles.md §8（フォームの実装パターン）
+ */
+
 'use server'
 
 import type { SubmissionResult } from '@conform-to/react'
@@ -8,6 +22,7 @@ import { ContactAdminEmail } from '@/emails/contact-admin-email'
 import { ContactUserEmail } from '@/emails/contact-user-email'
 import { env } from '@/env/server'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { siteConfig } from '@/config/site.config'
 import { contactFormSchema } from '@/schemas/contact-form-schema'
 
 const resend = new Resend(env.RESEND_API_KEY)
@@ -127,7 +142,7 @@ export async function contactFormAction(
         from: env.RESEND_FROM_EMAIL,
         to: env.RESEND_TO_EMAIL,
         replyTo: email,
-        subject: `【TRIANGLE SHOP】${name}様からのお問い合わせ`,
+        subject: `【${siteConfig.siteName}】${name}様からのお問い合わせ`,
         react: ContactAdminEmail({
           name,
           furigana: furigana || undefined,
@@ -139,7 +154,7 @@ export async function contactFormAction(
       resend.emails.send({
         from: env.RESEND_FROM_EMAIL,
         to: email,
-        subject: '【TRIANGLE SHOP】お問い合わせを受け付けました',
+        subject: `【${siteConfig.siteName}】お問い合わせを受け付けました`,
         react: ContactUserEmail({ name, message }),
       }),
     ])

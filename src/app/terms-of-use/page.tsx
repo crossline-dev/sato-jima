@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
+import { siteConfig } from '@/config/site.config'
+
+const pageDescription = `${siteConfig.siteName}の利用規約ページです。当サイトをご利用いただく前に、利用条件をご確認ください。`
 
 export const metadata: Metadata = {
   title: '利用規約',
-  description:
-    'TRIANGLE SHOPの利用規約ページです。当サイトをご利用いただく前に、利用条件をご確認ください。',
+  description: pageDescription,
   openGraph: {
     title: '利用規約',
-    description:
-      'TRIANGLE SHOPの利用規約ページです。当サイトをご利用いただく前に、利用条件をご確認ください。',
+    description: pageDescription,
   },
   robots: {
     index: false,

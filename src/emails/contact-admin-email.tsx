@@ -8,6 +8,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
+import { siteConfig } from '@/config/site.config'
 
 interface ContactAdminEmailProps {
   name: string
@@ -27,7 +28,7 @@ export function ContactAdminEmail({
   return (
     <Html lang='ja'>
       <Head />
-      <Preview>【TRIANGLE SHOP】{name}様からのお問い合わせ</Preview>
+      <Preview>【{siteConfig.siteName}】{name}様からのお問い合わせ</Preview>
       <Body style={{ fontFamily: 'sans-serif' }}>
         <Container style={{ maxWidth: '560px', margin: '0 auto' }}>
           <Heading style={{ fontSize: '18px' }}>
@@ -76,7 +77,7 @@ export function ContactAdminEmail({
           </Section>
 
           <Text style={{ fontSize: '12px', marginTop: '32px' }}>
-            TRIANGLE SHOP お問い合わせフォームより送信
+            {siteConfig.siteName} お問い合わせフォームより送信
           </Text>
         </Container>
       </Body>

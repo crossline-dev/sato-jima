@@ -52,7 +52,7 @@ export function MobileCollectionCarousel({
     <div className='overflow-hidden' ref={emblaRef}>
       <div className='flex'>
         {COLLECTIONS.map(collection => (
-          <TriangleSlide
+          <CollectionSlide
             key={collection.id}
             collection={collection}
             onClick={onItemClick}
@@ -63,12 +63,12 @@ export function MobileCollectionCarousel({
   )
 }
 
-interface TriangleSlideProps {
+interface CollectionSlideProps {
   collection: Collection
   onClick?: () => void
 }
 
-function TriangleSlide({ collection, onClick }: TriangleSlideProps) {
+function CollectionSlide({ collection, onClick }: CollectionSlideProps) {
   const { handle, title } = collection
   const displayTitle = DISPLAY_TITLES[handle] || title
 
@@ -130,7 +130,7 @@ function TriangleSlide({ collection, onClick }: TriangleSlideProps) {
             y={centroidY}
             textAnchor='middle'
             dominantBaseline='middle'
-            className='fill-foreground font-accent font-medium text-2xl leading-loose tracking-wide'>
+            className='fill-foreground font-en font-medium text-2xl leading-loose tracking-wide'>
             {displayTitle.split('\n').map((line, i, arr) => (
               <tspan
                 key={line}

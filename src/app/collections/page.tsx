@@ -4,10 +4,10 @@ import { Container } from '@/components/layout/container'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { siteConfig } from '@/config/site.config'
+import { robotsWithGooglePreview } from '@/lib/metadata/robots-metadata'
 
 const pageTitle = 'コレクション一覧'
-const pageDescription =
-  'TRIANGLE SHOPの商品コレクション一覧です。カテゴリ別に商品をお探しいただけます。'
+const pageDescription = `${siteConfig.siteName}の商品コレクション一覧です。カテゴリ別に商品をお探しいただけます。`
 
 export const metadata: Metadata = {
   title: pageTitle,
@@ -28,23 +28,13 @@ export const metadata: Metadata = {
     title: pageTitle,
     description: pageDescription,
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  robots: robotsWithGooglePreview({ index: true }),
 }
 
 export default function CollectionsPage() {
   return (
     <Main>
-      <PageHeader title='Our collections' description={<>3 collections</>} />
+      <PageHeader title='Our collections' description='コレクション一覧' />
       <section className='py-6 md:py-12'>
         <Container>
           <div className='mt-8 md:mt-12'>

@@ -3,15 +3,16 @@ import Link from 'next/link'
 import { Container } from '@/components/layout/container'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
+import { siteConfig } from '@/config/site.config'
+
+const pageDescription = `${siteConfig.siteName}のショッピングガイドページです。ご注文方法やお支払い方法、配送、返品についてご確認いただけます。`
 
 export const metadata: Metadata = {
   title: 'ショッピングガイド',
-  description:
-    'TRIANGLE SHOPのショッピングガイドページです。ご注文方法やお支払い方法、配送、返品についてご確認いただけます。',
+  description: pageDescription,
   openGraph: {
     title: 'ショッピングガイド',
-    description:
-      'TRIANGLE SHOPのショッピングガイドページです。ご注文方法やお支払い方法、配送、返品についてご確認いただけます。',
+    description: pageDescription,
   },
   robots: {
     index: false,

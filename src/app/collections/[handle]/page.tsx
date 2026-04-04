@@ -6,6 +6,7 @@ import { Main } from '@/components/layout/main'
 import { ProductCard } from '@/components/product/product-card'
 import { ProductGrid } from '@/components/product/product-grid'
 import { siteConfig } from '@/config/site.config'
+import { robotsWithGooglePreview } from '@/lib/metadata/robots-metadata'
 import {
   getAllCollectionHandles,
   getCollection,
@@ -57,17 +58,7 @@ export async function generateMetadata({
         title: allProductsTitle,
         description: allProductsDescription,
       },
-      robots: {
-        index: true,
-        follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          'max-video-preview': -1,
-          'max-image-preview': 'large',
-          'max-snippet': -1,
-        },
-      },
+      robots: robotsWithGooglePreview({ index: true }),
     }
   }
 
@@ -76,10 +67,7 @@ export async function generateMetadata({
   if (!collection) {
     return {
       title: 'コレクションが見つかりません',
-      robots: {
-        index: false,
-        follow: false,
-      },
+      robots: robotsWithGooglePreview({ index: false }),
     }
   }
 
@@ -122,17 +110,7 @@ export async function generateMetadata({
       description,
       images: collection.image ? [collection.image.url] : undefined,
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
+    robots: robotsWithGooglePreview({ index: true }),
   }
 }
 

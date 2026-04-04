@@ -8,6 +8,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
+import { siteConfig } from '@/config/site.config'
 
 interface ContactUserEmailProps {
   name: string
@@ -18,7 +19,7 @@ export function ContactUserEmail({ name, message }: ContactUserEmailProps) {
   return (
     <Html lang='ja'>
       <Head />
-      <Preview>【TRIANGLE SHOP】お問い合わせを受け付けました</Preview>
+      <Preview>【{siteConfig.siteName}】お問い合わせを受け付けました</Preview>
       <Body style={{ fontFamily: 'sans-serif' }}>
         <Container style={{ maxWidth: '560px', margin: '0 auto' }}>
           <Heading style={{ fontSize: '18px' }}>
@@ -27,8 +28,7 @@ export function ContactUserEmail({ name, message }: ContactUserEmailProps) {
 
           <Text style={{ fontSize: '16px', lineHeight: '1.6' }}>{name} 様</Text>
           <Text style={{ fontSize: '16px', lineHeight: '1.6' }}>
-            この度はTRIANGLE
-            SHOPへお問い合わせいただき、誠にありがとうございます。
+            この度は{siteConfig.siteName}へお問い合わせいただき、誠にありがとうございます。
             <br />
             以下の内容でお問い合わせを受け付けました。
           </Text>
@@ -58,7 +58,7 @@ export function ContactUserEmail({ name, message }: ContactUserEmailProps) {
           <Text style={{ fontSize: '12px', marginTop: '32px' }}>
             ※このメールは自動送信です。本メールへの返信はお控えください。
           </Text>
-          <Text style={{ fontSize: '12px' }}>TRIANGLE SHOP</Text>
+          <Text style={{ fontSize: '12px' }}>{siteConfig.siteName}</Text>
         </Container>
       </Body>
     </Html>

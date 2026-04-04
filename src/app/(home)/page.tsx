@@ -5,7 +5,6 @@ import { Suspense } from 'react'
 import { FeaturedCollections } from '@/components/collection/featured-collections'
 import { Container } from '@/components/layout/container'
 import { SectionTitle } from '@/components/layout/section-title'
-import { ThreeLine } from '@/components/layout/three-line'
 import { NewsList, NewsListSkeleton } from '@/components/news/news-list'
 import {
   NewItemsCarousel,
@@ -15,31 +14,30 @@ import {
   ProductList,
   ProductListSkeleton,
 } from '@/components/product/product-list'
+import { siteConfig } from '@/config/site.config'
 import { AnimationImage } from './_components/animation-image'
 import { HeroSection } from './_components/hero-section'
 
 export const metadata: Metadata = {
-  title: 'TRIANGLE SHOP | 佐藤三兄弟 公式グッズショップ',
-  description:
-    '佐藤三兄弟の公式グッズ販売サイト。オリジナルベアやイベントグッズ、アパレルなど、三兄弟それぞれの個性と世界観を楽しんでいただけるアイテムをご用意しています。',
+  title: `${siteConfig.siteName} | ${siteConfig.siteSubTitle}`,
+  description: siteConfig.siteDescription,
 }
 
 export default function Home() {
   return (
     <main>
       <HeroSection />
-      <ThreeLine />
       <section className='pt-24 pb-12'>
         <Container>
           <SectionTitle title='Concept' subtitle='コンセプト' />
           <div className='mt-12 text-center text-muted-foreground text-sm leading-loose md:text-base'>
             <p>
-              佐藤三兄弟のグッズ販売サイトは、ファンのみなさんとのつながりを大切にしながら
+              こだわりのアイテムを通じて、ファンのみなさんとのつながりを
               <br className='hidden md:block' />
-              三兄弟それぞれの個性と世界観を楽しんでいただける場所です。
+              大切にしていく場所です。
             </p>
             <p className='mt-6'>
-              三人の魅力が交わることで生まれる特別な世界を、グッズを通して感じていただけます。
+              ここでしか手に入らない特別なグッズをお届けします。
             </p>
             <p className='mt-6'>
               ただのアイテムではなく、みなさんとのコミュニケーションをつなぐツールとして、
@@ -50,11 +48,9 @@ export default function Home() {
         </Container>
       </section>
       <AnimationImage />
-      <ThreeLine />
       <Suspense fallback={<NewItemsCarouselSkeleton />}>
         <NewItemsCarousel />
       </Suspense>
-      <ThreeLine />
       <section className='py-24'>
         <Container>
           <SectionTitle title='Collections' subtitle='コレクション一覧' />
@@ -63,7 +59,6 @@ export default function Home() {
           </div>
         </Container>
       </section>
-      <ThreeLine />
       <section className='py-24'>
         <Container>
           <SectionTitle title='Products' subtitle='商品一覧' />
@@ -80,7 +75,6 @@ export default function Home() {
           </div>
         </Container>
       </section>
-      <ThreeLine />
       <section className='py-24'>
         <Container>
           <SectionTitle title='News' subtitle='お知らせ' />
@@ -94,3 +88,4 @@ export default function Home() {
     </main>
   )
 }
+

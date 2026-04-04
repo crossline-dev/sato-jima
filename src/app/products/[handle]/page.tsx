@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/layout/breadcrumbs'
 import { Container } from '@/components/layout/container'
 import { Main } from '@/components/layout/main'
 import { siteConfig } from '@/config/site.config'
+import { robotsWithGooglePreview } from '@/lib/metadata/robots-metadata'
 import { getProduct } from '@/lib/shopify'
 import { HIDDEN_PRODUCT_TAG } from '@/lib/shopify/constants'
 import { parseJsonMetafield } from '@/utils/parse-metafield'
@@ -26,10 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) {
     return {
       title: '商品が見つかりません',
-      robots: {
-        index: false,
-        follow: false,
-      },
+      robots: robotsWithGooglePreview({ index: false }),
     }
   }
 
@@ -60,17 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `/products/${handle}`,
     },
-    robots: {
-      index: indexable,
-      follow: indexable,
-      googleBot: {
-        index: indexable,
-        follow: indexable,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
+    robots: robotsWithGooglePreview({ index: indexable }),
     openGraph: {
       title,
       description,

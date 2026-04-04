@@ -2,15 +2,16 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/layout/container'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
+import { siteConfig } from '@/config/site.config'
+
+const pageDescription = `${siteConfig.siteName}の特定商取引法に基づく表記ページです。当サイトをご利用いただく前に、利用条件をご確認ください。`
 
 export const metadata: Metadata = {
   title: '特定商取引法に基づく表記',
-  description:
-    'TRIANGLE SHOPの特定商取引法に基づく表記ページです。当サイトをご利用いただく前に、利用条件をご確認ください。',
+  description: pageDescription,
   openGraph: {
     title: '特定商取引法に基づく表記',
-    description:
-      'TRIANGLE SHOPの特定商取引法に基づく表記ページです。当サイトをご利用いただく前に、利用条件をご確認ください。',
+    description: pageDescription,
   },
   robots: {
     index: false,

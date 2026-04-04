@@ -2,15 +2,16 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/layout/container'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
+import { siteConfig } from '@/config/site.config'
+
+const pageDescription = `${siteConfig.siteName}のプライバシーポリシーページです。当サイトにおける個人情報の取り扱いについてご確認いただけます。`
 
 export const metadata: Metadata = {
   title: 'プライバシーポリシー',
-  description:
-    'TRIANGLE SHOPのプライバシーポリシーページです。当サイトにおける個人情報の取り扱いについてご確認いただけます。',
+  description: pageDescription,
   openGraph: {
     title: 'プライバシーポリシー',
-    description:
-      'TRIANGLE SHOPのプライバシーポリシーページです。当サイトにおける個人情報の取り扱いについてご確認いただけます。',
+    description: pageDescription,
   },
   robots: {
     index: false,

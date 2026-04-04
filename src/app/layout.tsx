@@ -12,7 +12,7 @@ import { getCart } from '@/lib/shopify'
 import '@/styles/globals.css'
 import { Analytics } from '@vercel/analytics/next'
 import { metadataBase, siteConfig } from '@/config/site.config'
-import { accentFont, inter, notoSansJP } from '@/utils/fonts'
+import { inter, notoSansJP } from '@/utils/fonts'
 
 export const metadata: Metadata = {
   title: {
@@ -60,7 +60,7 @@ export default function RootLayout({
   return (
     <html
       lang='ja'
-      className={`${inter.variable} ${notoSansJP.variable} ${accentFont.variable}`}>
+      className={`${inter.variable} ${notoSansJP.variable}`}>
       <head>
         <link rel='preconnect' href='https://cdn.shopify.com' />
       </head>

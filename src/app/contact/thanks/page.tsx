@@ -24,8 +24,8 @@ export default function ContactThanksPage() {
               内容を確認の上、折り返しご連絡いたします。
             </p>
             <div className='mt-10'>
-              <Button asChild>
-                <Link href='/'>トップページへ戻る</Link>
+              <Button render={<Link href='/' />}>
+                トップページへ戻る
               </Button>
             </div>
           </div>

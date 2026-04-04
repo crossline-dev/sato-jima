@@ -3,15 +3,16 @@ import { ContactForm } from '@/components/contact/contact-form'
 import { Container } from '@/components/layout/container'
 import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
+import { siteConfig } from '@/config/site.config'
+
+const pageDescription = `${siteConfig.siteName}へのお問い合わせはこちらから。商品に関するご質問やご要望など、お気軽にお問い合わせください。`
 
 export const metadata: Metadata = {
   title: 'お問い合わせ',
-  description:
-    'TRIANGLE SHOP へのお問い合わせはこちらから。商品に関するご質問やご要望など、お気軽にお問い合わせください。',
+  description: pageDescription,
   openGraph: {
     title: 'お問い合わせ',
-    description:
-      'TRIANGLE SHOP へのお問い合わせはこちらから。商品に関するご質問やご要望など、お気軽にお問い合わせください。',
+    description: pageDescription,
   },
   alternates: {
     canonical: '/contact',

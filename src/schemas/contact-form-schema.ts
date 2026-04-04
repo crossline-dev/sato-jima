@@ -1,3 +1,16 @@
+/**
+ * @agent-guard
+ * バリデーションスキーマ（src/schemas/）の運用ルール
+ *
+ * - 新規スキーマは Valibot で作成すること（Zod 禁止）
+ * - 既存の Zod スキーマはそのまま維持し、積極的に書き換えない
+ * - このスキーマはフォーム4層構成のうち「スキーマ層」に該当する:
+ *   スキーマ(Valibot) → Server Action(parseWithValibot) → フック(useActionState) → コンポーネント(Conform)
+ *
+ * @see docs/adr/004-valibot-migration-policy.md
+ * @see docs/agent-rules/01-principles.md §8（フォームの実装パターン）
+ */
+
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import * as v from 'valibot'
 

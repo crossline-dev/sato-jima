@@ -147,10 +147,15 @@ export function ContactForm() {
           orientation='horizontal'
           data-invalid={!fields.privacy.valid || undefined}>
           <Checkbox
+            key={fields.privacy.key}
             id={fields.privacy.id}
             name={fields.privacy.name}
             required={fields.privacy.required}
-            defaultChecked={fields.privacy.initialValue === 'on'}
+            checked={
+              fields.privacy.value === 'on' ||
+              (fields.privacy.value === undefined &&
+                fields.privacy.initialValue === 'on')
+            }
             aria-invalid={!fields.privacy.valid || undefined}
             aria-describedby={
               fields.privacy.errors ? `${fields.privacy.id}-error` : undefined
@@ -158,7 +163,7 @@ export function ContactForm() {
             onCheckedChange={checked => {
               form.update({
                 name: fields.privacy.name,
-                value: checked === true,
+                value: checked === true ? 'on' : undefined,
               })
             }}
           />

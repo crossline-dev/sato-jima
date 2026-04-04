@@ -5,10 +5,10 @@ import { Main } from '@/components/layout/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { NewsList, NewsListSkeleton } from '@/components/news/news-list'
 import { siteConfig } from '@/config/site.config'
+import { robotsWithGooglePreview } from '@/lib/metadata/robots-metadata'
 
 const pageTitle = 'お知らせ一覧'
-const pageDescription =
-  'TRIANGLE SHOPの最新のお知らせ・ニュースをお届けします。新商品情報やキャンペーン情報などをご確認いただけます。'
+const pageDescription = `${siteConfig.siteName}の最新のお知らせ・ニュースをお届けします。新商品情報やキャンペーン情報などをご確認いただけます。`
 
 export const metadata: Metadata = {
   title: pageTitle,
@@ -29,17 +29,7 @@ export const metadata: Metadata = {
     title: pageTitle,
     description: pageDescription,
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  robots: robotsWithGooglePreview({ index: true }),
 }
 
 export default function NewsPage() {

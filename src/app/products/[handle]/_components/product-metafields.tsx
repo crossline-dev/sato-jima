@@ -43,7 +43,7 @@ export function ProductMetafields({
   }
 
   return (
-    <Accordion type='multiple' className='w-full'>
+    <Accordion multiple className='w-full'>
       {/* 素材 */}
       {materials?.value && (
         <AccordionItem value='materials'>

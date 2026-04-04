@@ -1,7 +1,7 @@
 'use client'
 
 import useEmblaCarousel from 'embla-carousel-react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { cn } from '@/utils/classes'
@@ -150,7 +150,7 @@ export function ProductCardCarousel({
           'hover:bg-white disabled:pointer-events-none disabled:opacity-0',
         )}
         aria-label='Previous image'>
-        <ChevronLeft className='h-4 w-4' />
+        <CaretLeft className='h-4 w-4' />
       </button>
 
       <button
@@ -163,7 +163,7 @@ export function ProductCardCarousel({
           'hover:bg-white disabled:pointer-events-none disabled:opacity-0',
         )}
         aria-label='Next image'>
-        <ChevronRight className='h-4 w-4' />
+        <CaretRight className='h-4 w-4' />
       </button>
 
       {/* Dot indicators - always visible on mobile, hover-only on desktop */}

@@ -1,7 +1,7 @@
 'use client'
 
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
+import { CaretLeft, CaretRight, X } from '@phosphor-icons/react'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import {
@@ -69,7 +69,7 @@ export function ImageLightbox({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
         <DialogOverlay className='bg-white/90 backdrop-blur-sm' />
-        <DialogPrimitive.Content
+        <DialogPrimitive.Popup
           className='fixed inset-0 z-50 flex items-center justify-center focus:outline-none'
           aria-describedby={undefined}>
           <DialogPrimitive.Title className='sr-only'>
@@ -78,7 +78,7 @@ export function ImageLightbox({
 
           {/* 閉じるボタン */}
           <DialogClose className='absolute top-4 right-4 z-10 cursor-pointer rounded-full bg-black/5 p-2 text-black transition-colors hover:bg-black/10'>
-            <X className='size-6' strokeWidth={1.2} />
+            <X className='size-6' weight='light' />
             <span className='sr-only'>閉じる</span>
           </DialogClose>
 
@@ -89,7 +89,7 @@ export function ImageLightbox({
               onClick={goToPrevious}
               className='absolute left-4 z-10 cursor-pointer rounded-full bg-black/5 p-3 text-black transition-colors hover:bg-black/10'
               aria-label='前の画像'>
-              <ChevronLeft className='size-8' strokeWidth={1.2} />
+              <CaretLeft className='size-8' weight='light' />
             </button>
           )}
 
@@ -114,7 +114,7 @@ export function ImageLightbox({
               onClick={goToNext}
               className='absolute right-4 z-10 cursor-pointer rounded-full bg-black/5 p-3 text-black transition-colors hover:bg-black/10'
               aria-label='次の画像'>
-              <ChevronRight className='size-8' strokeWidth={1.2} />
+              <CaretRight className='size-8' weight='light' />
             </button>
           )}
 
@@ -137,7 +137,7 @@ export function ImageLightbox({
               ))}
             </div>
           )}
-        </DialogPrimitive.Content>
+        </DialogPrimitive.Popup>
       </DialogPortal>
     </Dialog>
   )
