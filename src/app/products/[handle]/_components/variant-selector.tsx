@@ -267,11 +267,17 @@ function getColorValue(colorName: string): string {
     red: '#A14D4A',
     blue: '#5E768E',
     green: '#637F71',
-    // Character colors
-    ayato: '#A14D4A',
-    hayato: '#5E768E',
-    yoshito: '#637F71',
-    y0shito: '#637F71',
+    black: '#1A1A1A',
+    white: '#F5F5F5',
+    pink: '#D4A0A0',
+    yellow: '#D4C87A',
+    orange: '#D4965A',
+    purple: '#8B7AAD',
+    brown: '#8B7355',
+    gray: '#808080',
+    grey: '#808080',
+    navy: '#2C3E6B',
+    beige: '#C8B99A',
   }
 
   const lowerName = colorName.toLowerCase()

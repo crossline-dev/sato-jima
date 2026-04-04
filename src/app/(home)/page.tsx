@@ -15,7 +15,6 @@ import {
   ProductListSkeleton,
 } from '@/components/product/product-list'
 import { siteConfig } from '@/config/site.config'
-import { AnimationImage } from './_components/animation-image'
 import { HeroSection } from './_components/hero-section'
 
 export const metadata: Metadata = {
@@ -47,7 +46,6 @@ export default function Home() {
           </div>
         </Container>
       </section>
-      <AnimationImage />
       <Suspense fallback={<NewItemsCarouselSkeleton />}>
         <NewItemsCarousel />
       </Suspense>

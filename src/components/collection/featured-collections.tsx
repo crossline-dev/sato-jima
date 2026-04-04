@@ -72,22 +72,6 @@ function CollectionCard({
   const { handle, title } = collection
   const prefersReducedMotion = useReducedMotion()
 
-  // 表示用タイトルのマッピング（改行対応）
-  const DISPLAY_TITLES: Record<string, string> = {
-    'original-bear': 'Original\nBear',
-    'event-goods': 'Event\nGoods',
-    apparel: 'Apparel',
-  }
-  const displayTitle = DISPLAY_TITLES[handle] || title
-
-  const width = 300
-  const height = 260
-  const padding = 2
-
-  // 三角形の重心（テキスト配置用）
-  const centroidX = width / 2
-  const centroidY = (0 + height + height) / 3 // 三角形の重心Y座標
-
   // アニメーション設定（reduced-motion 対応）
   const animationProps = prefersReducedMotion
     ? {
@@ -123,62 +107,11 @@ function CollectionCard({
       <Link
         href={storefrontCollectionPath(handle)}
         onClick={onClick}
-        className='group relative flex w-full cursor-pointer flex-col items-center transition-transform hover:scale-105'
-        style={{
-          aspectRatio: `${width + padding * 2} / ${height + padding * 2}`,
-        }}>
-        <svg
-          width='100%'
-          height='100%'
-          viewBox={`${-padding} ${-padding} ${width + padding * 2} ${height + padding * 2}`}
-          preserveAspectRatio='xMidYMid meet'
-          className='h-full w-full'>
-          <title>{title}</title>
-
-          {/* 線1: 一番外側（太い） - foreground色 100% */}
-          <path
-            d={`M${width / 2},0 L0,${height} L${width},${height} Z`}
-            fill='none'
-            className='stroke-foreground'
-            strokeWidth='2'
-            strokeLinejoin='miter'
-          />
-
-          {/* 線2: 内側（細い） - foreground色 50% */}
-          <path
-            d={`M${width / 2},12 L12,${height - 7} L${width - 12},${height - 7} Z`}
-            fill='none'
-            className='stroke-foreground/50'
-            strokeWidth='1.5'
-            strokeLinejoin='miter'
-          />
-
-          {/* 線3: 一番内側（細い） - foreground色 25% */}
-          <path
-            d={`M${width / 2},24 L24,${height - 14} L${width - 24},${height - 14} Z`}
-            fill='none'
-            className='stroke-foreground/25'
-            strokeWidth='1'
-            strokeLinejoin='miter'
-          />
-
-          {/* タイトルテキスト - 三角形の中央に配置（改行対応） */}
-          <text
-            x={centroidX}
-            y={centroidY}
-            textAnchor='middle'
-            dominantBaseline='middle'
-            className='fill-foreground font-en font-medium text-xl leading-loose tracking-wide'>
-            {displayTitle.split('\n').map((line, i, arr) => (
-              <tspan
-                key={line}
-                x={centroidX}
-                dy={i === 0 ? `${-(arr.length - 1) * 0.6}em` : '1.25em'}>
-                {line}
-              </tspan>
-            ))}
-          </text>
-        </svg>
+        className='group relative flex w-full cursor-pointer flex-col items-center justify-center border border-border bg-muted/30 px-6 py-12 transition-all duration-300 hover:border-foreground/30 hover:bg-muted/50'
+        style={{ aspectRatio: '304 / 264' }}>
+        <span className='font-en font-medium text-foreground text-xl tracking-wide'>
+          {title}
+        </span>
       </Link>
     </m.article>
   )
