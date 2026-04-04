@@ -43,3 +43,9 @@ next-env.d.ts
 # Others
 /.example/
 /docs/
+
+# Takt workflow
+.takt/
+
+# References
+/references/
