@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { CircleNotch } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/classes'
 
 interface SpinnerProps {
@@ -14,6 +14,6 @@ const sizeClasses = {
 
 export function Spinner({ className, size = 'md' }: SpinnerProps) {
   return (
-    <Loader2 className={cn('animate-spin', sizeClasses[size], className)} />
+    <CircleNotch className={cn('animate-spin', sizeClasses[size], className)} />
   )
 }
