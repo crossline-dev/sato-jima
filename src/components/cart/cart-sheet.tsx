@@ -1,7 +1,8 @@
 'use client'
 
-import { BasketIcon } from '@phosphor-icons/react/dist/ssr'
+import { BasketIcon } from '@phosphor-icons/react/ssr'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { getCheckoutUrl } from '@/actions/cart-actions'
 import { CartItem } from '@/components/cart/cart-item'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { useCartSchedule } from '@/hooks/use-cart-schedule'
 import { useCart } from '@/lib/cart'
+import { CART_ERROR_MESSAGES } from '@/lib/cart/cart-error'
 import { formatPrice } from '@/utils/format/price'
 
 export function CartSheet() {
@@ -26,15 +28,22 @@ export function CartSheet() {
 
   const handleCheckout = async () => {
     setIsCheckingOut(true)
-    const result = await getCheckoutUrl().catch(() => null)
-    const url = result?.success ? result.url : null
-    if (url) {
-      // ページ遷移するまでisCheckingOutはtrueのまま
-      window.location.href = url
-    } else {
-      // エラー時はローディングを解除
-      setIsCheckingOut(false)
+    try {
+      const result = await getCheckoutUrl()
+      if (result.success && result.url) {
+        window.location.href = result.url
+        return
+      }
+      if (!result.success) {
+        toast.error(result.error ?? CART_ERROR_MESSAGES.checkoutFailed)
+      } else {
+        toast.error(CART_ERROR_MESSAGES.checkoutFailed)
+      }
+    } catch (error) {
+      console.error('[cart] getCheckoutUrl failed', error)
+      toast.error(CART_ERROR_MESSAGES.checkoutFailed)
     }
+    setIsCheckingOut(false)
   }
 
   const subtotal = cart?.cost.subtotalAmount.amount ?? '0'

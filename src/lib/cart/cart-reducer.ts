@@ -1,22 +1,23 @@
 import type { Cart, CartItem } from '@/lib/shopify'
 import type { CurrencyCode } from '@/lib/shopify/generated/graphql'
 import type { CartAction, UpdateType } from './context-types'
+import {
+  formatMinorToAmount,
+  multiplyUnitPriceByQuantity,
+  parseMoneyToMinor,
+} from './cart-money'
 
-/**
- * デフォルト通貨コード
- */
 const DEFAULT_CURRENCY = 'JPY' as CurrencyCode
 
-/**
- * アイテムコストを計算
- */
-function calculateItemCost(quantity: number, price: string): string {
-  return (Number(price) * quantity).toString()
+function resolveOptimisticCurrency(
+  lines: CartItem[],
+  fallback: CurrencyCode,
+): CurrencyCode {
+  const first = lines[0]
+  if (!first) return fallback
+  return first.cost.totalAmount.currencyCode
 }
 
-/**
- * カートアイテムを更新
- */
 function updateCartItemInList(
   item: CartItem,
   updateType: UpdateType,
@@ -27,10 +28,11 @@ function updateCartItemInList(
     updateType === 'plus' ? item.quantity + 1 : item.quantity - 1
   if (newQuantity <= 0) return null
 
-  const singleItemPrice = Number(item.merchandise.price.amount)
-  const newTotalAmount = calculateItemCost(
+  const currency = item.merchandise.price.currencyCode
+  const newTotalAmount = multiplyUnitPriceByQuantity(
+    item.merchandise.price.amount,
     newQuantity,
-    singleItemPrice.toString(),
+    currency,
   )
 
   return {
@@ -45,40 +47,53 @@ function updateCartItemInList(
   }
 }
 
-/**
- * カート合計を更新
- */
 function updateCartTotals(
   lines: CartItem[],
   currencyCode: CurrencyCode,
+  previousCost: Cart['cost'],
 ): Pick<Cart, 'totalQuantity' | 'cost'> {
   const totalQuantity = lines.reduce((sum, item) => sum + item.quantity, 0)
-  const totalAmount = lines.reduce(
-    (sum, item) => sum + Number(item.cost.totalAmount.amount),
-    0,
-  )
+  const subtotalMinor = lines.reduce((sum, item) => {
+    const c = item.cost.totalAmount.currencyCode
+    return sum + parseMoneyToMinor(item.cost.totalAmount.amount, c)
+  }, 0n)
+
+  const sameCurrency =
+    previousCost.subtotalAmount.currencyCode === currencyCode &&
+    previousCost.totalAmount.currencyCode === currencyCode
+
+  const nonSubtotalMinor = sameCurrency
+    ? parseMoneyToMinor(previousCost.totalAmount.amount, currencyCode) -
+      parseMoneyToMinor(previousCost.subtotalAmount.amount, currencyCode)
+    : 0n
+
+  const totalMinor = subtotalMinor + nonSubtotalMinor
 
   return {
     totalQuantity,
     cost: {
-      subtotalAmount: { amount: totalAmount.toString(), currencyCode },
-      totalAmount: { amount: totalAmount.toString(), currencyCode },
-      totalTaxAmount: { amount: '0', currencyCode },
+      subtotalAmount: {
+        amount: formatMinorToAmount(subtotalMinor, currencyCode),
+        currencyCode,
+      },
+      totalAmount: {
+        amount: formatMinorToAmount(totalMinor, currencyCode),
+        currencyCode,
+      },
+      totalTaxAmount: previousCost.totalTaxAmount
+        ? {
+            amount: previousCost.totalTaxAmount.amount,
+            currencyCode: previousCost.totalTaxAmount.currencyCode,
+          }
+        : previousCost.totalTaxAmount,
     },
   }
 }
 
-/**
- * 楽観更新の打ち消し用に、現在のカートをディープコピーする
- * （undefined の場合はそのまま戻すことで、厳密な直前状態を維持する）
- */
 export function cloneCartSnapshot(cart: Cart | undefined): Cart | undefined {
   return cart ? structuredClone(cart) : undefined
 }
 
-/**
- * 空のカートを作成
- */
 export function createEmptyCart(): Cart {
   return {
     id: '',
@@ -93,19 +108,15 @@ export function createEmptyCart(): Cart {
   }
 }
 
-/**
- * カートリデューサー
- */
 export function cartReducer(
   state: Cart | undefined,
   action: CartAction,
 ): Cart | undefined {
   if (action.type === 'RESET_TO_CART') {
-    return action.payload.cart ? structuredClone(action.payload.cart) : undefined
+    return action.payload.cart
   }
 
   const currentCart = state || createEmptyCart()
-  const currencyCode = currentCart.cost.totalAmount.currencyCode as CurrencyCode
 
   switch (action.type) {
     case 'UPDATE_ITEM': {
@@ -123,15 +134,32 @@ export function cartReducer(
           totalQuantity: 0,
           cost: {
             ...currentCart.cost,
-            totalAmount: { ...currentCart.cost.totalAmount, amount: '0' },
-            subtotalAmount: { ...currentCart.cost.subtotalAmount, amount: '0' },
+            subtotalAmount: {
+              ...currentCart.cost.subtotalAmount,
+              amount: '0',
+            },
+            totalAmount: {
+              ...currentCart.cost.totalAmount,
+              amount: '0',
+            },
+            totalTaxAmount: currentCart.cost.totalTaxAmount
+              ? {
+                  ...currentCart.cost.totalTaxAmount,
+                  amount: '0',
+                }
+              : currentCart.cost.totalTaxAmount,
           },
         }
       }
 
+      const currencyCode = resolveOptimisticCurrency(
+        updatedLines,
+        currentCart.cost.totalAmount.currencyCode as CurrencyCode,
+      )
+
       return {
         ...currentCart,
-        ...updateCartTotals(updatedLines, currencyCode),
+        ...updateCartTotals(updatedLines, currencyCode, currentCart.cost),
         lines: updatedLines,
       }
     }
@@ -145,6 +173,7 @@ export function cartReducer(
       let updatedLines: CartItem[]
 
       if (existingItem) {
+        const c = existingItem.merchandise.price.currencyCode
         updatedLines = currentCart.lines.map(line =>
           line.merchandise.id === item.merchandise.id
             ? {
@@ -152,9 +181,10 @@ export function cartReducer(
                 quantity: line.quantity + item.quantity,
                 cost: {
                   totalAmount: {
-                    amount: calculateItemCost(
-                      line.quantity + item.quantity,
+                    amount: multiplyUnitPriceByQuantity(
                       line.merchandise.price.amount,
+                      line.quantity + item.quantity,
+                      c,
                     ),
                     currencyCode: line.cost.totalAmount.currencyCode,
                   },
@@ -166,9 +196,14 @@ export function cartReducer(
         updatedLines = [...currentCart.lines, item]
       }
 
+      const currencyCode = resolveOptimisticCurrency(
+        updatedLines,
+        currentCart.cost.totalAmount.currencyCode as CurrencyCode,
+      )
+
       return {
         ...currentCart,
-        ...updateCartTotals(updatedLines, currencyCode),
+        ...updateCartTotals(updatedLines, currencyCode, currentCart.cost),
         lines: updatedLines,
       }
     }

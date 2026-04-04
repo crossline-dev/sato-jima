@@ -2,6 +2,22 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { CART_OPEN_DATE } from '@/config/site.config'
+import { formatCartOpenLabel } from '@/lib/cart/format-cart-open-label'
+
+const MAX_CART_OPEN_TIMER_MS = 24 * 60 * 60 * 1000
+
+/**
+ * 次回いつカート開放を再判定するか（ミリ秒）。既に開放済みなら null。
+ * 24時間超先の開放でも、最大24時間ごとにタイマーを張り直す。
+ */
+export function getNextCartOpenCheckDelayMs(
+  nowMs: number,
+  targetMs: number,
+): number | null {
+  if (nowMs >= targetMs) return null
+  const remaining = targetMs - nowMs
+  return Math.min(remaining, MAX_CART_OPEN_TIMER_MS)
+}
 
 /**
  * カートの開放状態をリアクティブに管理するフック
@@ -17,47 +33,40 @@ import { CART_OPEN_DATE } from '@/config/site.config'
 export function useCartSchedule(saleStartDate?: string | null) {
   const [isCartOpen, setIsCartOpen] = useState(false)
 
-  // 判定対象の日時を決定
   const targetDate = useMemo(() => {
     if (saleStartDate) {
       const parsed = new Date(saleStartDate)
-      // 不正な日時の場合はグローバル設定にフォールバック
       if (!Number.isNaN(parsed.getTime())) return parsed
     }
     return CART_OPEN_DATE
   }, [saleStartDate])
 
   useEffect(() => {
-    // クライアントサイドで現在の状態を判定
-    if (Date.now() >= targetDate.getTime()) {
-      setIsCartOpen(true)
-      return
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+    const schedule = () => {
+      const delay = getNextCartOpenCheckDelayMs(
+        Date.now(),
+        targetDate.getTime(),
+      )
+      if (delay === null) {
+        setIsCartOpen(true)
+        return
+      }
+      timeoutId = setTimeout(schedule, delay)
     }
 
-    const remaining = targetDate.getTime() - Date.now()
+    schedule()
 
-    // 残り時間が24時間以上の場合はタイマーを設定しない
-    // ページリロード時に再計算される
-    if (remaining > 24 * 60 * 60 * 1000) return
-
-    const timerId = setTimeout(() => {
-      setIsCartOpen(true)
-    }, remaining)
-
-    return () => clearTimeout(timerId)
+    return () => {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId)
+      }
+    }
   }, [targetDate])
 
-  // 表示用ラベル（例: "2/28(土) 12:00"）
   const cartOpenLabel = useMemo(
-    () =>
-      targetDate.toLocaleDateString('ja-JP', {
-        month: 'numeric',
-        day: 'numeric',
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'Asia/Tokyo',
-      }),
+    () => formatCartOpenLabel(targetDate),
     [targetDate],
   )
 

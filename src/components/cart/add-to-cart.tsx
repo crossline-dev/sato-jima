@@ -1,7 +1,6 @@
 'use client'
 
-import { HandbagIcon } from '@phosphor-icons/react'
-import { Plus } from 'lucide-react'
+import { HandbagIcon, Plus } from '@phosphor-icons/react'
 import { useRef, useTransition } from 'react'
 import { toast } from 'sonner'
 import { addItem } from '@/actions/cart-actions'
@@ -42,6 +41,32 @@ type AddToCartProps = {
   }
 }
 
+function buildOptimisticCartItem(
+  variantId: string,
+  itemInfo: AddToCartProps['itemInfo'],
+): CartItem {
+  return {
+    id: `optimistic-${Date.now()}`,
+    quantity: 1,
+    cost: {
+      totalAmount: {
+        amount: itemInfo.price,
+        currencyCode: itemInfo.currencyCode,
+      },
+    },
+    merchandise: {
+      id: variantId,
+      title: itemInfo.variantTitle,
+      selectedOptions: [],
+      price: {
+        amount: itemInfo.price,
+        currencyCode: itemInfo.currencyCode,
+      },
+      product: itemInfo.product,
+    },
+  }
+}
+
 export function AddToCart({
   variantId,
   availableForSale,
@@ -59,27 +84,7 @@ export function AddToCart({
   const handleAddToCart = () => {
     if (!variantId) return
 
-    // 楽観的更新用のカートアイテムを作成
-    const optimisticItem: CartItem = {
-      id: `optimistic-${Date.now()}`, // 一時的な ID
-      quantity: 1,
-      cost: {
-        totalAmount: {
-          amount: itemInfo.price,
-          currencyCode: itemInfo.currencyCode,
-        },
-      },
-      merchandise: {
-        id: variantId,
-        title: itemInfo.variantTitle,
-        selectedOptions: [],
-        price: {
-          amount: itemInfo.price,
-          currencyCode: itemInfo.currencyCode,
-        },
-        product: itemInfo.product,
-      },
-    }
+    const optimisticItem = buildOptimisticCartItem(variantId, itemInfo)
 
     // 楽観的更新 → Server Action。失敗時は addCartItem 前のスナップショットへ restoreCartToSnapshot で戻す
     startTransition(async () => {
@@ -162,19 +167,27 @@ export function AddToCartMini({
   variantId,
   availableForSale,
   saleStartDate,
+  itemInfo,
 }: {
   variantId: string
   availableForSale: boolean
   saleStartDate?: string | null
+  itemInfo: AddToCartProps['itemInfo']
 }) {
   const [isPending, startTransition] = useTransition()
-  const { openCart } = useCart()
+  const { cart, addCartItem, restoreCartToSnapshot, openCart } = useCart()
+  const cartRef = useRef(cart)
+  cartRef.current = cart
   const { isCartOpen } = useCartSchedule(saleStartDate)
 
   const handleAddToCart = () => {
     startTransition(async () => {
+      const cartBeforeOptimisticAdd = cloneCartSnapshot(cartRef.current)
+      const optimisticItem = buildOptimisticCartItem(variantId, itemInfo)
+      addCartItem(optimisticItem)
       const result = await addItem(variantId)
       if (!result.success) {
+        restoreCartToSnapshot(cartBeforeOptimisticAdd)
         toast.error(result.error || 'カートへの追加に失敗しました。')
         return
       }

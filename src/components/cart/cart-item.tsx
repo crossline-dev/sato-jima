@@ -1,13 +1,13 @@
 'use client'
 
-import { TrashIcon } from '@phosphor-icons/react'
-import { Minus, Plus } from 'lucide-react'
+import { Minus, Plus, TrashIcon } from '@phosphor-icons/react'
 import Image from 'next/image'
-import { useTransition } from 'react'
+import { useRef, useTransition } from 'react'
 import { toast } from 'sonner'
 import { removeItem, updateItemQuantity } from '@/actions/cart-actions'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/lib/cart'
+import { cloneCartSnapshot } from '@/lib/cart/cart-reducer'
 import type { CartItem as CartItemType } from '@/lib/shopify'
 import { formatPrice } from '@/utils/format/price'
 
@@ -16,30 +16,34 @@ type CartItemProps = {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { updateCartItem } = useCart()
+  const { cart, updateCartItem, restoreCartToSnapshot } = useCart()
+  const cartRef = useRef(cart)
+  cartRef.current = cart
   const [isPending, startTransition] = useTransition()
 
   const handleQuantityChange = (action: 'plus' | 'minus') => {
-    // 楽観的更新とサーバーアクションを transition 内で実行
     startTransition(async () => {
+      const snapshot = cloneCartSnapshot(cartRef.current)
       updateCartItem(item.id, action)
       const newQuantity =
         action === 'plus' ? item.quantity + 1 : item.quantity - 1
       const result = await updateItemQuantity(item.id, newQuantity)
 
       if (!result.success) {
+        restoreCartToSnapshot(snapshot)
         toast.error(result.error || '数量の更新に失敗しました。')
       }
     })
   }
 
   const handleRemove = () => {
-    // 楽観的更新とサーバーアクションを transition 内で実行
     startTransition(async () => {
+      const snapshot = cloneCartSnapshot(cartRef.current)
       updateCartItem(item.id, 'delete')
       const result = await removeItem(item.id)
 
       if (!result.success) {
+        restoreCartToSnapshot(snapshot)
         toast.error(result.error || '削除に失敗しました。')
       }
     })

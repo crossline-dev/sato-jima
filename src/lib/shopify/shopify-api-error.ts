@@ -1,6 +1,13 @@
 /**
- * Shopify Storefront API 呼び出しの統一エラー契約。
- * クライアント／サーバー双方の fetch で同一の型を throw する。
+ * @agent-guard
+ * Shopify Storefront API 呼び出しの統一エラー契約
+ *
+ * - Shopify API エラーには必ず ShopifyApiError を使う。独自の Error サブクラスを作らないこと
+ * - 新しいエラー種別が必要な場合は ShopifyApiErrorKind に追加する
+ * - ファクトリ関数（rejectAsShopify*）を経由して throw する
+ * - processShopifyStorefrontResponse が fetch 後の統一検証ゲート
+ *
+ * @see docs/adr/002-unified-shopify-error-contract.md
  */
 
 export type ShopifyApiErrorKind = 'graphql' | 'http' | 'network' | 'parse'

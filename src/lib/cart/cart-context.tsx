@@ -19,10 +19,6 @@ import type {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined)
 
-/**
- * カートプロバイダー
- * Server Component から cartPromise を受け取り、子コンポーネントに提供
- */
 export function CartProvider({
   children,
   cartPromise,
@@ -41,12 +37,6 @@ export function CartProvider({
   )
 }
 
-/**
- * カートフック
- * - `cartReducer`: 純粋なカート変換（ADD / UPDATE / RESET）
- * - ここでは `useOptimistic` に reducer を渡し、楽観更新の dispatch を公開する
- * - Server Action 失敗後の復旧は呼び出し側が `cloneCartSnapshot` → `restoreCartToSnapshot` で行う
- */
 export function useCart(): UseCartReturn {
   const context = useContext(CartContext)
   if (!context) {
@@ -77,7 +67,6 @@ export function useCart(): UseCartReturn {
     [updateOptimisticCart],
   )
 
-  /** Server Action 失敗時: addCartItem 前に cloneCartSnapshot で保存した状態へ戻す */
   const restoreCartToSnapshot = useCallback(
     (snapshot: Cart | undefined) => {
       updateOptimisticCart({
