@@ -1,9 +1,9 @@
 'use client'
 
+import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react'
-import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/classes'
