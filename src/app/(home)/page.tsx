@@ -30,17 +30,17 @@ export default function Home() {
           <SectionTitle title='Concept' subtitle='コンセプト' />
           <div className='mt-12 text-center text-muted-foreground text-sm leading-loose md:text-base'>
             <p>
-              こだわりのアイテムを通じて、ファンのみなさんとのつながりを
+              こちらはモック用の仮テキストです。実際の公開時には、
               <br className='hidden md:block' />
-              大切にしていく場所です。
+              正式なコンセプト文に差し替わります。
             </p>
             <p className='mt-6'>
-              ここでしか手に入らない特別なグッズをお届けします。
+              現在はレイアウト確認のためのダミー文を表示しています。
             </p>
             <p className='mt-6'>
-              ただのアイテムではなく、みなさんとのコミュニケーションをつなぐツールとして、
+              この段落も仮の文章です。文量や改行バランスを確認するために、
               <br className='hidden md:block' />
-              遊び心のあるデザインやアート性のあるグッズもご用意しています。
+              一時的にプレースホルダーを配置しています。
             </p>
           </div>
         </Container>
