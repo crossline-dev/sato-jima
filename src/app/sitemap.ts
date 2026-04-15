@@ -1,11 +1,19 @@
 import type { MetadataRoute } from 'next'
 
 import { siteConfig } from '@/config/site.config'
+import { isPublicSiteVisibility } from '@/config/site-visibility'
 import { getAllNewsArticleIds } from '@/lib/microcms'
 import { getAllCollectionHandles, getProducts } from '@/lib/shopify'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (!isPublicSiteVisibility()) {
+    return []
+  }
+
   const baseUrl = siteConfig.siteUrl
+
+  // TODO: 一般公開前のテスト公開期間は sitemap を空配列にするか route 自体を止める
+  // robots と合わせて、商品・コレクション URL を検索エンジンへ通知しない状態にする
 
   // 静的ページ
   const staticPages: MetadataRoute.Sitemap = [

@@ -12,7 +12,10 @@ import { getCart } from '@/lib/shopify'
 import '@/styles/globals.css'
 import { Analytics } from '@vercel/analytics/next'
 import { metadataBase, siteConfig } from '@/config/site.config'
+import { isPublicSiteVisibility } from '@/config/site-visibility'
 import { inter, notoSansJP } from '@/utils/fonts'
+
+const isPublic = isPublicSiteVisibility()
 
 export const metadata: Metadata = {
   title: {
@@ -43,6 +46,17 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: siteConfig.siteUrl,
+  },
+  robots: {
+    index: isPublic,
+    follow: isPublic,
+    googleBot: {
+      index: isPublic,
+      follow: isPublic,
+      'max-video-preview': isPublic ? -1 : 0,
+      'max-image-preview': isPublic ? 'large' : 'none',
+      'max-snippet': isPublic ? -1 : 0,
+    },
   },
   description: siteConfig.siteDescription,
   metadataBase: metadataBase,

@@ -17,7 +17,7 @@
     "@conform-to/valibot": "1.17.1",
     "@phosphor-icons/react": "2.1.10",
     "@react-email/components": "1.0.10",
-    "@shopify/hydrogen-react": "2026.1.2",
+    "@shopify/hydrogen-react": "2026.4.0",
     "@t3-oss/env-nextjs": "0.13.11",
     "@upstash/ratelimit": "2.0.8",
     "@upstash/redis": "1.37.0",

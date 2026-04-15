@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { isPublicSiteVisibility } from '@/config/site-visibility'
 
 type Robots = NonNullable<Metadata['robots']>
 
@@ -9,8 +10,9 @@ export function robotsWithGooglePreview(options: {
   index: boolean
   follow?: boolean
 }): Robots {
-  const { index } = options
-  const follow = options.follow ?? index
+  const isPublic = isPublicSiteVisibility()
+  const index = isPublic ? options.index : false
+  const follow = isPublic ? (options.follow ?? index) : false
   return {
     index,
     follow,

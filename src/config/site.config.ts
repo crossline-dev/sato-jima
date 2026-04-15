@@ -10,6 +10,8 @@
  */
 
 function resolveBaseUrl(): string {
+  // TODO: Vercel の独自ドメインを本番適用したら、Production 環境に NEXT_PUBLIC_SITE_URL を必ず設定する
+  // 未設定だと metadata / canonical / sitemap / robots が *.vercel.app を基準に生成される場合がある
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
   return `http://localhost:${process.env.PORT || 3000}`
