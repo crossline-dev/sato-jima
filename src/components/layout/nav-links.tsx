@@ -1,19 +1,8 @@
 import Link from 'next/link'
-import { useState } from 'react'
 import {
   PRODUCTS_MENU_COLLECTION_ITEMS,
   storefrontCollectionPath,
 } from '@/config/navigation'
-import { FeaturedCollections } from '@/components/collection/featured-collections'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
 import { cn } from '@/utils/classes'
 
 export interface NavItem {
@@ -34,83 +23,23 @@ interface NavLinksProps {
   className?: string
   linkClassName?: string
   onClick?: () => void
-  onMegaMenuChange?: (isOpen: boolean) => void
 }
 
-export function NavLinks({
-  className,
-  linkClassName,
-  onClick,
-  onMegaMenuChange,
-}: NavLinksProps) {
-  const [menuValue, setMenuValue] = useState('')
-  const [openCount, setOpenCount] = useState(0)
-
-  const handleValueChange = (value: string) => {
-    setMenuValue(value)
-    onMegaMenuChange?.(value !== '')
-    // メニューが開いた時にカウンターをインクリメント（アニメーション再トリガー用）
-    if (value === 'Collections') {
-      setOpenCount(prev => prev + 1)
-    }
-  }
-
-  const handleItemClick = () => {
-    // メニューを閉じる
-    setMenuValue('')
-    onMegaMenuChange?.(false)
-    onClick?.()
-  }
-
+export function NavLinks({ className, linkClassName, onClick }: NavLinksProps) {
   return (
-    <NavigationMenu
-      className={className}
-      value={menuValue}
-      onValueChange={handleValueChange}>
-      <NavigationMenuList className='gap-2'>
-        {NAV_ITEMS.map(item => (
-          <NavigationMenuItem key={item.href} value={item.label}>
-            {item.label === 'Collections' ? (
-              <>
-                <NavigationMenuTrigger
-                  className={cn(
-                    'bg-transparent font-medium text-sm transition-all hover:opacity-100',
-                    'relative pb-2 after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:-translate-x-1/2 after:bg-current after:transition-all hover:after:w-full data-[state=open]:after:w-full',
-                    linkClassName,
-                  )}>
-                  {item.label}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className='w-screen'>
-                    <div className='mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8'>
-                      <FeaturedCollections
-                        key={openCount}
-                        onItemClick={handleItemClick}
-                        animateOnMount
-                      />
-                    </div>
-                  </div>
-                </NavigationMenuContent>
-              </>
-            ) : (
-              <NavigationMenuLink
-                render={
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      navigationMenuTriggerStyle(),
-                      'bg-transparent font-medium text-sm hover:opacity-70',
-                      linkClassName,
-                    )}
-                    onClick={handleItemClick}
-                  />
-                }>
-                {item.label}
-              </NavigationMenuLink>
-            )}
-          </NavigationMenuItem>
-        ))}
-      </NavigationMenuList>
-    </NavigationMenu>
+    <nav className={cn('items-center gap-2', className)}>
+      {NAV_ITEMS.map(item => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            'inline-flex h-9 items-center rounded-md px-4 py-2 font-medium text-sm transition-opacity hover:opacity-70',
+            linkClassName,
+          )}
+          onClick={onClick}>
+          {item.label}
+        </Link>
+      ))}
+    </nav>
   )
 }

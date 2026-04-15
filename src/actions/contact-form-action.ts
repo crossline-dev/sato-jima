@@ -136,11 +136,19 @@ export async function contactFormAction(
 
   const { name, furigana, email, phone, message } = submission.value
 
+  if (!env.RESEND_FROM_EMAIL || !env.RESEND_TO_EMAIL) {
+    logContactEvent('send_failed', 'resend_not_configured', {})
+    return errorResponse(USER_MSG_SEND_FAILED, 'send_failed')
+  }
+
+  const fromEmail = env.RESEND_FROM_EMAIL
+  const toEmail = env.RESEND_TO_EMAIL
+
   try {
     const [adminResult, userResult] = await Promise.all([
       resend.emails.send({
-        from: env.RESEND_FROM_EMAIL,
-        to: env.RESEND_TO_EMAIL,
+        from: fromEmail,
+        to: toEmail,
         replyTo: email,
         subject: `【${siteConfig.siteName}】${name}様からのお問い合わせ`,
         react: ContactAdminEmail({
@@ -152,7 +160,7 @@ export async function contactFormAction(
         }),
       }),
       resend.emails.send({
-        from: env.RESEND_FROM_EMAIL,
+        from: fromEmail,
         to: email,
         subject: `【${siteConfig.siteName}】お問い合わせを受け付けました`,
         react: ContactUserEmail({ name, message }),

@@ -1,11 +1,7 @@
-'use client'
-
-import { UserIcon } from '@phosphor-icons/react'
-import { usePathname } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { UserIcon } from '@phosphor-icons/react/ssr'
+import { Suspense } from 'react'
 import { CartButton } from '@/components/cart/cart-button'
 import { SHOPIFY_CUSTOMER_ACCOUNT_URL } from '@/config/navigation'
-import { cn } from '@/utils/classes'
 import { MobileMenu } from './mobile-menu'
 import { NavLinks } from './nav-links'
 import { SiteLogo } from './site-logo'
@@ -20,35 +16,8 @@ function CartButtonFallback() {
 }
 
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
-  const pathname = usePathname()
-  const isHomePage = pathname === '/'
-
-  // 透明状態: ホームページ + スクロールなし + メガメニュー閉じた状態
-  const isTransparent = isHomePage && !isScrolled && !isMegaMenuOpen
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-    // passive: true でスクロールパフォーマンスを向上
-    // ブラウザは preventDefault() が呼ばれないことを保証し、
-    // メインスレッドをブロックせずにスクロール処理を実行できる
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   return (
-    <header
-      data-transparent={isTransparent}
-      data-menu-open={isMegaMenuOpen}
-      className={cn(
-        'group/header fixed top-0 z-50 w-full font-en transition-all duration-300 ease-in-out',
-        isTransparent
-          ? 'bg-transparent pt-1.5 text-white'
-          : 'bg-white text-foreground',
-      )}>
+    <header className='fixed top-0 z-50 w-full bg-white font-en text-foreground'>
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='flex h-16 items-center justify-between gap-4'>
           {/* 左側: モバイルメニュー (Mobile) / ナビゲーション (Desktop) */}
@@ -58,10 +27,7 @@ export function Header() {
                 <MobileMenu />
               </Suspense>
             </div>
-            <NavLinks
-              className='hidden md:flex'
-              onMegaMenuChange={setIsMegaMenuOpen}
-            />
+            <NavLinks className='hidden md:flex' />
           </div>
 
           {/* 中央: ロゴ */}

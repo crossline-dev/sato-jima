@@ -50,7 +50,7 @@ export function CartSheet() {
 
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && closeCart()}>
-      <SheetContent className='flex w-full sm:max-w-lg'>
+      <SheetContent className='flex data-[side=right]:w-full data-[side=right]:sm:max-w-none'>
         <SheetHeader className='border-b pb-4'>
           <SheetTitle className='flex items-center gap-2 font-en font-medium leading-none'>
             <span>Cart</span>

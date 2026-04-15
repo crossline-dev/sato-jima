@@ -49,3 +49,9 @@ next-env.d.ts
 
 # References
 /references/
+
+# agents
+.claude/
+/AGENTS.md
+/GEMINI.md
+/CLAUDE.md

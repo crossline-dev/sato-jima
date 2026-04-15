@@ -15,6 +15,10 @@ export const getNewsArticles = unstable_cache(
     limit?: number
     offset?: number
   }): Promise<{ articles: NewsArticle[]; totalCount: number }> => {
+    if (!microcmsClient) {
+      return { articles: [], totalCount: 0 }
+    }
+
     const data = await microcmsClient.getList<NewsArticle>({
       endpoint: NEWS_ENDPOINT,
       queries: {
@@ -42,6 +46,10 @@ export async function getNewsArticleById(
 ): Promise<NewsArticle | null> {
   return unstable_cache(
     async () => {
+      if (!microcmsClient) {
+        return null
+      }
+
       try {
         const article = await microcmsClient.get<NewsArticle>({
           endpoint: NEWS_ENDPOINT,
@@ -63,6 +71,10 @@ export async function getNewsArticleById(
  */
 export const getAllNewsArticleIds = unstable_cache(
   async (): Promise<string[]> => {
+    if (!microcmsClient) {
+      return []
+    }
+
     const data = await microcmsClient.getList<NewsArticle>({
       endpoint: NEWS_ENDPOINT,
       queries: {

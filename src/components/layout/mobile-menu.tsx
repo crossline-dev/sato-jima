@@ -3,14 +3,8 @@
 import { UserIcon } from '@phosphor-icons/react'
 import type { Route } from 'next'
 import Link from 'next/link'
-import {
-  FEATURED_COLLECTION_MENU_ITEMS,
-  SHOPIFY_CUSTOMER_ACCOUNT_URL,
-  storefrontCollectionPath,
-} from '@/config/navigation'
 import { FOOTER_NAV } from '@/components/layout/footer-nav'
 import { MOBILE_NAV_ITEMS } from '@/components/layout/navigation-data'
-import { useMobileMenuState } from '@/hooks/use-mobile-menu-state'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Sheet,
@@ -20,8 +14,17 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import {
+  FEATURED_COLLECTION_MENU_ITEMS,
+  SHOPIFY_CUSTOMER_ACCOUNT_URL,
+  storefrontCollectionPath,
+} from '@/config/navigation'
+import { useMobileMenuState } from '@/hooks/use-mobile-menu-state'
 
-export { MOBILE_NAV_ITEMS, type MobileNavItem } from '@/components/layout/navigation-data'
+export {
+  MOBILE_NAV_ITEMS,
+  type MobileNavItem,
+} from '@/components/layout/navigation-data'
 
 export function MobileMenu() {
   const { isOpen, setIsOpen } = useMobileMenuState()

@@ -12,7 +12,7 @@ const storeDomain =
   process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ||
   'https://sato-triplets.myshopify.com'
 const apiVersion =
-  process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_VERSION || '2025-07'
+  process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_VERSION || '2026-04'
 const accessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_TOKEN || ''
 
 if (!accessToken) {

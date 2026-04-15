@@ -2,7 +2,6 @@ import { CaretRightIcon } from '@phosphor-icons/react/ssr'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { FeaturedCollections } from '@/components/collection/featured-collections'
 import { Container } from '@/components/layout/container'
 import { SectionTitle } from '@/components/layout/section-title'
 import { NewsList, NewsListSkeleton } from '@/components/news/news-list'
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main>
+    <main className='mt-16'>
       <HeroSection />
       <section className='pt-24 pb-12'>
         <Container>
@@ -49,14 +48,6 @@ export default function Home() {
       <Suspense fallback={<NewItemsCarouselSkeleton />}>
         <NewItemsCarousel />
       </Suspense>
-      <section className='py-24'>
-        <Container>
-          <SectionTitle title='Collections' subtitle='コレクション一覧' />
-          <div className='mt-12'>
-            <FeaturedCollections />
-          </div>
-        </Container>
-      </section>
       <section className='py-24'>
         <Container>
           <SectionTitle title='Products' subtitle='商品一覧' />
@@ -86,4 +77,3 @@ export default function Home() {
     </main>
   )
 }
-
